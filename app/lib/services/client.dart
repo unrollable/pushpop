@@ -1,46 +1,38 @@
 import 'package:intl/intl.dart';
+import 'dart:async';
 import 'package:pushpop/models/messages.dart';
 import 'data.dart';
-import 'notice.dart';
-import 'msg_provider.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Future<void> handleNewMessage(messageData, ref) async {
-  String currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+StreamSubscription<SSEModel>? sseSubscription;
 
-  Message message = Message(
-    type: messageData['type'],
-    time: currentTime,
-    title: messageData['title'],
-    content: messageData['content'],
-  );
-  ref.read(messageProvider.notifier).addMessage(message);
-
-  saveMessage(message);
-  showLocalNotification(message);
+Stream<Message> createSSEConnection(Ref ref) {
+  var settings = getSettings();
+  String key = settings.apiKey;
+  String server = settings.serverHost;
+  String port = settings.serverPort;
+  return SSEClient.subscribeToSSE(
+      method: SSERequestType.GET,
+      url: 'http://$server:$port/events/$key',
+      header: {
+        "Accept": "text/event-stream",
+        "Cache-Control": "no-cache",
+      }).map((event) {
+    print('Event: ' + event.event!);
+    print('Data: ' + event.data!);
+    Map<String, dynamic> messageData = jsonDecode(event.data!);
+    String currentTime =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    messageData['time'] = currentTime;
+    print(messageData);
+    return Message.fromJson(messageData);
+  });
 }
 
-void createSSEConnection(apiKey, WidgetRef ref) async {
-  SSEClient.subscribeToSSE(
-      method: SSERequestType.GET,
-      url:
-      'http://127.0.0.1:8080/events/$apiKey',
-      header: {
-          "Accept": "text/event-stream",
-          "Cache-Control": "no-cache",
-      }).listen((event) {
-          // print('Id: ' + event.id!);
-          print('Event: ' + event.event!);
-          print('Data: ' + event.data!);
-          Map<String, dynamic> messageData = jsonDecode(event.data!);
-          print(messageData);
-          handleNewMessage(messageData, ref);
-          // showLocalNotification(messageData);
-          
-      },
-  );
-
+void closeSSEConnection() {
+  sseSubscription?.cancel();
+  SSEClient.unsubscribeFromSSE();
 }
