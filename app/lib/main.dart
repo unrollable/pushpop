@@ -25,7 +25,7 @@ void main() async {
 
   await HiveService.init();
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.hide(); // Start hidden in the tray
+    await windowManager.hide();
   });
 
   // Settings settings = getSettings();
@@ -39,7 +39,6 @@ void main() async {
     shortcutPolicy: ShortcutPolicy.requireCreate,
   );
 
-  // runApp(PushPopApp());
   runApp(ProviderScope(child: PushPopApp()));
 }
 
@@ -104,7 +103,6 @@ class _HomePageState extends State<HomePage> with TrayListener, WindowListener {
   }
 
   Future<void> _restoreApp() async {
-    // Function to bring app window to the foreground
     await windowManager.show();
     await windowManager.focus();
   }

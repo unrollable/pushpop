@@ -4,7 +4,7 @@ import 'package:pushpop/services/msg_provider.dart';
 import 'package:pushpop/services/client.dart';
 
 
-final container = ProviderContainer();
+// final container = ProviderContainer();
 
 class MessagesPage extends ConsumerWidget {
   final ScrollController _scrollController = ScrollController();
@@ -13,7 +13,10 @@ class MessagesPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final messages = ref.watch(messageProvider);
 
-    createSSEConnection("1234", ref);
+    // createSSEConnection(ref);
+    // createSSEConnection(ref).listen((message) {
+    //   ref.read(messageProvider.notifier).addMessage(message);
+    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {

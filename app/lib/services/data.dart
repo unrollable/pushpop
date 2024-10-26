@@ -1,7 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:io';
-import '../models/messages.dart';
-import '../models/settings.dart';
+import 'package:pushpop/models/messages.dart';
+import 'package:pushpop/models/settings.dart';
 
 class HiveService {
   static Future<void> init() async {
@@ -21,8 +21,8 @@ List<Message> getMessages() {
 }
 
 Settings getSettings() {
-  var settings = Hive.box<Settings>('settings');
-  return settings.get('appSettings', defaultValue: Settings())!;
+  var box = Hive.box<Settings>('settings');
+  return box.get('appSettings', defaultValue: Settings())!;
 }
 
 Future<void> saveMessage(Message message) async {

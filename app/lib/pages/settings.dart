@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pushpop/services/msg_provider.dart';
 import 'package:pushpop/services/data.dart';
 import 'package:pushpop/models/settings.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:pushpop/utils/util.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -48,9 +52,32 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             SizedBox(height: 20),
             _buildSettingsSection(
+              title: '网络',
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    final messageNotifier = ref.read(messageProvider.notifier);
+                    return _buildButtonSetting(
+                      context,
+                      '服务器',
+                      '重连',
+                      () => messageNotifier.reconnect(),
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                _buildSwitchSetting(
+                  'customServer',
+                  '自定义服务器',
+                  settings.customServer,
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            _buildSettingsSection(
               title: '账户',
               children: [
-                _buildUserSetting(context, '未登录'),
+                _buildButtonSetting(context, '未登录', '登陆', signIn),
                 SizedBox(height: 10),
                 _buildApiKeySetting(context),
               ],
@@ -59,21 +86,12 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildSettingsSection(
               title: '其他',
               children: [
-                _buildLinkRow(
-                  '关于PushWave',
-                  '查看',
-                  'https://about.link'),
+                _buildLinkRow('关于PushPop', '查看', 'https://about.link'),
                 SizedBox(height: 10),
-                _buildLinkRow(
-                  '支持PushWave',
-                  '捐赠',
-                  'https://support.link'),
+                _buildLinkRow('支持PushPop', '捐赠', 'https://support.link'),
                 SizedBox(height: 10),
-                _buildLinkRow(
-                  '隐私政策',
-                  '查看',
-                  'https://privacy.link'),
-                ],
+                _buildLinkRow('隐私政策', '查看', 'https://privacy.link'),
+              ],
             )
           ],
         ),
@@ -104,7 +122,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildDropdownSetting(String key, String title, List<String> options) {
-    String selectedOption = options[0];
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -121,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Center(
               child: DropdownButton<String>(
                 value: settings.language,
-                onChanged: (String? newValue) async{
+                onChanged: (String? newValue) async {
                   Settings updated = await updateSetting(key, newValue);
                   setState(() {
                     settings = updated;
@@ -173,11 +190,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildUserSetting(BuildContext context, String username) {
+  Widget _buildButtonSetting(
+      BuildContext context, String title, String opt, Function onClick) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('$username'),
+        Text('$title'),
         SizedBox(
           height: 50,
           width: 160,
@@ -190,9 +208,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle login/logout
+                  onClick();
                 },
-                child: Text(username == '未登录' ? '登录' : '登出'),
+                child: Text(opt),
               ),
             ),
           ),
@@ -221,13 +239,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      // Handle reset API key
+                    onPressed: () async {
+                      Settings updated =
+                          await updateSetting('apiKey', genApiKey());
+                      setState(() {
+                        settings = updated;
+                      });
                     },
                     child: Text('重置'),
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showApiKeyDialog(context, settings.apiKey);
+                    },
                     child: Text('查看'),
                   ),
                 ],
@@ -255,7 +279,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             child: Center(
               child: ElevatedButton(
-                onPressed: () async{
+                onPressed: () async {
                   if (await canLaunch(url)) {
                     await launch(url);
                   } else {
@@ -268,6 +292,42 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ],
+    );
+  }
+
+  void signIn() {
+    print("wait to develope...");
+  }
+
+  void _showApiKeyDialog(BuildContext context, String apiKey) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: Text('API Key'),
+          content:
+              apiKey.isEmpty ? Text('还未创建API Key') : SelectableText(apiKey),
+          actions: [
+            if (apiKey.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: apiKey));
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('clipboard!')),
+                  );
+                },
+                child: Text('复制'),
+              ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('关闭'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

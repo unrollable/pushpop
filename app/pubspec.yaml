@@ -21,6 +21,7 @@ dependencies:
   flutter_riverpod: ^2.6.0
   flutter_client_sse: ^2.0.3
   url_launcher: ^6.3.0
+  crypto: ^3.0.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.1"

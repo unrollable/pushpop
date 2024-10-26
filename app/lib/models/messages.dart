@@ -19,4 +19,13 @@ class Message {
     required this.title,
     required this.content,
   });
+
+  factory Message.fromJson(Map<String, dynamic> message) {
+    return Message(
+      type: message['type'],
+      time: message['time'],
+      title: message['title'],
+      content: message['content'],
+    );
+  }
 }

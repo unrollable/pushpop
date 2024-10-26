@@ -21,13 +21,18 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       autoStartup: fields[1] as bool,
       hiddenStartup: fields[2] as bool,
       quitToTray: fields[3] as bool,
+      customServer: fields[4] as bool,
+      serverHost: fields[5] as String,
+      serverPort: fields[6] as String,
+      enableSSL: fields[7] as bool,
+      apiKey: fields[8] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Settings obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.language)
       ..writeByte(1)
@@ -35,7 +40,17 @@ class SettingsAdapter extends TypeAdapter<Settings> {
       ..writeByte(2)
       ..write(obj.hiddenStartup)
       ..writeByte(3)
-      ..write(obj.quitToTray);
+      ..write(obj.quitToTray)
+      ..writeByte(4)
+      ..write(obj.customServer)
+      ..writeByte(5)
+      ..write(obj.serverHost)
+      ..writeByte(6)
+      ..write(obj.serverPort)
+      ..writeByte(7)
+      ..write(obj.enableSSL)
+      ..writeByte(8)
+      ..write(obj.apiKey);
   }
 
   @override
