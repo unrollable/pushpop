@@ -75,8 +75,10 @@ class _HomePageState extends State<HomePage> with TrayListener, WindowListener {
   }
 
   Future<void> _setTray() async {
-    String iconPath = path.join(Directory.current.path, 'windows', 'runner',
-        'resources', 'app_icon.ico');
+    String exePath = Platform.resolvedExecutable;
+    String installDir = File(exePath).parent.path;
+    String iconPath = path.join(installDir, 'data', 'flutter_assets', 'assets',
+        'images', 'app_icon.ico');
     await trayManager.setIcon(Platform.isWindows ? iconPath : iconPath);
 
     await trayManager.setToolTip('PushPop');

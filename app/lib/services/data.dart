@@ -34,10 +34,20 @@ Future<Settings> updateSetting(String key, dynamic value) async {
   Settings settings = getSettings();
   Map<String, dynamic> jsonSettings = settings.toJson();
   jsonSettings[key] = value;
+  if (key == "customServer" && value == false) {
+    restoreDefaultServer(jsonSettings);
+  }
   Settings newSettings = Settings.fromJson(jsonSettings);
   await updateSettings(newSettings);
   print("----update $key to $value");
   return newSettings;
+}
+
+void restoreDefaultServer(jsonSettings) {
+  Settings defaultSettings = Settings();
+  jsonSettings['serverHost'] = defaultSettings.serverHost;
+  jsonSettings['serverPort'] = defaultSettings.serverPort;
+  jsonSettings['enableSSL'] = defaultSettings.enableSSL;
 }
 
 Future<void> updateSettings(Settings settings) async {

@@ -33,16 +33,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   '语言',
                   ['简体中文', 'English'],
                 ),
+                SizedBox(height: 10),
                 _buildSwitchSetting(
                   'quitToTray',
                   '关闭时最小化到托盘',
                   settings.quitToTray,
                 ),
+                SizedBox(height: 10),
                 _buildSwitchSetting(
                   'autoStartup',
                   '开机自启',
                   settings.autoStartup,
                 ),
+                SizedBox(height: 10),
                 _buildSwitchSetting(
                   'hiddenStartup',
                   '自启到托盘',
@@ -61,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                       '服务器',
                       '重连',
-                      () => messageNotifier.reconnect(),
+                      () => messageNotifier.loadInitialMessages(),
                     );
                   },
                 ),
@@ -71,13 +74,27 @@ class _SettingsPageState extends State<SettingsPage> {
                   '自定义服务器',
                   settings.customServer,
                 ),
+                SizedBox(height: 10),
+                if (settings.customServer) ...[
+                  _buildTextFieldSetting(
+                      'serverHost', '主机', settings.serverHost),
+                  SizedBox(height: 10),
+                  _buildTextFieldSetting(
+                      'serverPort', '端口', settings.serverPort),
+                  SizedBox(height: 10),
+                  _buildSwitchSetting(
+                    'enableSSL',
+                    '启用SSL',
+                    settings.enableSSL,
+                  ),
+                ],
               ],
             ),
             SizedBox(height: 20),
             _buildSettingsSection(
               title: '账户',
               children: [
-                _buildButtonSetting(context, '未登录', '登陆', signIn),
+                _buildButtonSetting(context, '未登录', '登录', signIn),
                 SizedBox(height: 10),
                 _buildApiKeySetting(context),
               ],
@@ -180,6 +197,47 @@ class _SettingsPageState extends State<SettingsPage> {
                   Settings updated = await updateSetting(key, newValue);
                   setState(() {
                     settings = updated;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextFieldSetting(String key, String title, String initialValue) {
+    TextEditingController controller =
+        TextEditingController(text: initialValue);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title),
+        SizedBox(
+          height: 50,
+          width: 160,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: TextField(
+                controller: controller,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0),
+                ),
+                onSubmitted: (value) async {
+                  Settings updated = await updateSetting(key, value);
+                  setState(() {
+                    settings = updated;
+                    // controller.text = updated.serverHost;
                   });
                 },
               ),

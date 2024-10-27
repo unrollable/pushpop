@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pushpop/services/msg_provider.dart';
-import 'package:pushpop/services/client.dart';
-
-
-// final container = ProviderContainer();
 
 class MessagesPage extends ConsumerWidget {
   final ScrollController _scrollController = ScrollController();
@@ -12,11 +8,6 @@ class MessagesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final messages = ref.watch(messageProvider);
-
-    // createSSEConnection(ref);
-    // createSSEConnection(ref).listen((message) {
-    //   ref.read(messageProvider.notifier).addMessage(message);
-    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {

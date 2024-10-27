@@ -14,13 +14,17 @@ Stream<Message> createSSEConnection(Ref ref) {
   String key = settings.apiKey;
   String server = settings.serverHost;
   String port = settings.serverPort;
+  String protocol = settings.enableSSL ? 'https' : 'http';
+
   return SSEClient.subscribeToSSE(
-      method: SSERequestType.GET,
-      url: 'http://$server:$port/events/$key',
-      header: {
-        "Accept": "text/event-stream",
-        "Cache-Control": "no-cache",
-      }).map((event) {
+    method: SSERequestType.POST,
+    url: '$protocol://$server:$port/events',
+    header: {
+      "Accept": "text/event-stream",
+      "Cache-Control": "no-cache",
+    },
+    body: {"apikey": key},
+  ).map((event) {
     print('Event: ' + event.event!);
     print('Data: ' + event.data!);
     Map<String, dynamic> messageData = jsonDecode(event.data!);
@@ -30,9 +34,4 @@ Stream<Message> createSSEConnection(Ref ref) {
     print(messageData);
     return Message.fromJson(messageData);
   });
-}
-
-void closeSSEConnection() {
-  sseSubscription?.cancel();
-  SSEClient.unsubscribeFromSSE();
 }

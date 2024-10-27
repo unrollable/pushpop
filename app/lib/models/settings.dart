@@ -38,10 +38,9 @@ class Settings {
     this.quitToTray = true,
     this.customServer = false,
     this.serverHost = "127.0.0.1",
-    this.serverPort = "8080",
+    this.serverPort = "8000",
     this.enableSSL = false,
     this.apiKey = "",
-
   });
 
   factory Settings.fromJson(Map<String, dynamic> settings) {
@@ -52,7 +51,7 @@ class Settings {
       quitToTray: settings['quitToTray'] ?? true,
       customServer: settings['customServer'] ?? false,
       serverHost: settings['serverHost'] ?? "127.0.0.1",
-      serverPort: settings['serverPort'] ?? "8080",
+      serverPort: settings['serverPort'] ?? "8000",
       enableSSL: settings['enableSSL'] ?? false,
       apiKey: settings['apiKey'] ?? "",
     );

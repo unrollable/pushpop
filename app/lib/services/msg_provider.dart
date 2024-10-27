@@ -7,6 +7,8 @@ import 'dart:async';
 import 'client.dart';
 import 'notice.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 final messageProvider =
     StateNotifierProvider<MessageNotifier, List<Message>>((ref) {
@@ -18,6 +20,7 @@ final messageProvider =
 class MessageNotifier extends StateNotifier<List<Message>> {
   final Ref ref;
   StreamSubscription? sseSubscription;
+  Timer? heartbeatTimer;
 
   MessageNotifier(this.ref) : super([]);
 
@@ -30,11 +33,17 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   void _initSSEConnection() async {
     Settings settings = getSettings();
     if (settings.apiKey.isEmpty || settings.apiKey == null) {
-      await updateSetting('apiKey', genApiKey());
+      settings = await updateSetting('apiKey', genApiKey());
     }
 
+    sseSubscription?.cancel();
     sseSubscription = createSSEConnection(ref).listen((message) {
       handleNewMessage(message);
+    });
+
+    heartbeatTimer?.cancel();
+    heartbeatTimer = Timer.periodic(Duration(seconds: 20), (timer) {
+      _sendHeartbeat(settings);
     });
   }
 
@@ -48,8 +57,25 @@ class MessageNotifier extends StateNotifier<List<Message>> {
     state = [...state, message];
   }
 
+  void _sendHeartbeat(Settings settings) async {
+    try {
+      var server = settings.serverHost;
+      var port = settings.serverPort;
+      var url = 'http://$server:$port/heartbeat';
+      print("send heartbeat to $url");
+      await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"apikey": settings.apiKey}),
+      );
+    } catch (e) {
+      print("Heartbeat error: $e");
+    }
+  }
+
   void closeConnect() {
     sseSubscription?.cancel();
+    heartbeatTimer?.cancel();
     SSEClient.unsubscribeFromSSE();
   }
 
@@ -60,7 +86,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
 
   @override
   void dispose() {
-    sseSubscription?.cancel();
+    closeConnect();
     super.dispose();
   }
 }
