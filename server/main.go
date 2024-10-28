@@ -159,6 +159,6 @@ func closeClient(apikey string) {
 		timer.Stop()
 		delete(heartbeats, apikey)
 	}
-	fmt.Println("disconnect %s", apikey)
+	fmt.Println("disconnect ", apikey)
 	mu.Unlock()
 }
