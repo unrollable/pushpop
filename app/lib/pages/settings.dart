@@ -103,11 +103,14 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildSettingsSection(
               title: '其他',
               children: [
-                _buildLinkRow('关于PushPop', '查看', 'https://about.link'),
+                _buildLinkRow('关于PushPop', '查看',
+                    'https://github.com/unrollable/pushpop?tab=readme-ov-file#about'),
                 SizedBox(height: 10),
-                _buildLinkRow('支持PushPop', '捐赠', 'https://support.link'),
+                _buildLinkRow('支持PushPop', '捐赠',
+                    'https://github.com/unrollable/pushpop?tab=readme-ov-file#about'),
                 SizedBox(height: 10),
-                _buildLinkRow('隐私政策', '查看', 'https://privacy.link'),
+                _buildLinkRow('隐私政策', '查看',
+                    'https://github.com/unrollable/pushpop?tab=readme-ov-file#about'),
               ],
             )
           ],
