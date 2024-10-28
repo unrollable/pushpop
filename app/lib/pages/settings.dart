@@ -64,7 +64,17 @@ class _SettingsPageState extends State<SettingsPage> {
                       context,
                       '服务器',
                       '重连',
-                      () => messageNotifier.loadInitialMessages(),
+                      () async => {
+                        messageNotifier.connected = false,
+                        messageNotifier.loadInitialMessages(),
+                        if (messageNotifier.connected != null &&
+                            messageNotifier.connected == true)
+                          {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Connected!')),
+                            )
+                          }
+                      },
                     );
                   },
                 ),
