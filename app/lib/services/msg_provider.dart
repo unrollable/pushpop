@@ -21,6 +21,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
   final Ref ref;
   StreamSubscription? sseSubscription;
   Timer? heartbeatTimer;
+  bool? connected;
 
   MessageNotifier(this.ref) : super([]);
 
@@ -38,7 +39,11 @@ class MessageNotifier extends StateNotifier<List<Message>> {
 
     sseSubscription?.cancel();
     sseSubscription = createSSEConnection(ref).listen((message) {
-      handleNewMessage(message);
+      if (message != null) {
+        handleNewMessage(message);
+      } else {
+        connected = true;
+      }
     });
 
     heartbeatTimer?.cancel();

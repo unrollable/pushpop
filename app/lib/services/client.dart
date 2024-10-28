@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 StreamSubscription<SSEModel>? sseSubscription;
 
-Stream<Message> createSSEConnection(Ref ref) {
+Stream<Message?> createSSEConnection(Ref ref) {
   var settings = getSettings();
   String key = settings.apiKey;
   String server = settings.serverHost;
@@ -27,6 +27,9 @@ Stream<Message> createSSEConnection(Ref ref) {
   ).map((event) {
     print('Event: ' + event.event!);
     print('Data: ' + event.data!);
+    if (event.data!.trim() == 'connected') {
+      return null;
+    }
     Map<String, dynamic> messageData = jsonDecode(event.data!);
     String currentTime =
         DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());

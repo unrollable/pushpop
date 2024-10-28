@@ -74,6 +74,10 @@ func handleEvents(c *gin.Context) {
 	}
 	fmt.Println("client [", apikey, "] is listening...")
 
+	reply := "connected"
+	fmt.Fprintf(c.Writer, "data: %s\n\n", reply)
+	flusher.Flush()
+
 	for {
 		select {
 		case message, ok := <-messageChan:

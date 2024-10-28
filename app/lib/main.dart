@@ -28,8 +28,8 @@ void main() async {
     await windowManager.hide();
   });
 
-  // Settings settings = getSettings();
-  // windowManager.setPreventClose(settings.quitToTray);
+  Settings settings = getSettings();
+  windowManager.setPreventClose(settings.quitToTray);
   windowManager.setTitle("PushPop");
 
   appWindow.minSize = ui.Size(600, 400);
@@ -135,11 +135,7 @@ class _HomePageState extends State<HomePage> with TrayListener, WindowListener {
 
   @override
   void onWindowClose() async {
-    // bool isPreventClose = await windowManager.isPreventClose();
-    Settings settings = getSettings();
-    windowManager.setPreventClose(settings.quitToTray);
-    bool quitToTray = settings.quitToTray;
-    print("quittotray:$quitToTray");
+    bool quitToTray = await windowManager.isPreventClose();
     if (quitToTray) {
       await windowManager.hide();
     } else {
