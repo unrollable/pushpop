@@ -94,4 +94,4 @@ flutter build windows
 - Do not use commercially
 
 ## Donate
-<img src="/doc/images/alipay.jpg" alt="支付宝" width="300" />支付宝<img src="/doc/images/btc.jpg" alt="支付宝" width="300" />BTC
+<img src="/doc/images/alipay.jpg" alt="支付宝" width="300" />支付宝<img src="/doc/images/btc.jpg" alt="BTC" width="300" />BTC

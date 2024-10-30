@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -24,9 +26,19 @@ var (
 	heartbeats   = make(map[string]*time.Timer)
 )
 
-const heartbeatTimeout = 1 * time.Minute
+const heartbeatTimeout = 5 * time.Minute
+
+func initLog() {
+	file, err := os.OpenFile("app.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatalf("failed to open log file: %v", err)
+	}
+	log.SetOutput(file)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
 
 func main() {
+	initLog()
 	router := gin.Default()
 
 	router.POST("/events", handleEvents)
@@ -49,7 +61,6 @@ func handleEvents(c *gin.Context) {
 	}
 
 	apikey := request.ApiKey
-	// var messageChan chan Message
 
 	closeClient(apikey)
 	mu.Lock()
@@ -72,7 +83,7 @@ func handleEvents(c *gin.Context) {
 		http.Error(c.Writer, "Streaming unsupported!", http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("client [", apikey, "] is listening...")
+	log.Printf("client [%s] is listening...", apikey)
 
 	reply := "connected"
 	fmt.Fprintf(c.Writer, "data: %s\n\n", reply)
@@ -81,13 +92,13 @@ func handleEvents(c *gin.Context) {
 	for {
 		select {
 		case message, ok := <-messageChan:
-			fmt.Println("received data, will push to client")
+			// log.Println("received data, will push to client")
 			if !ok {
 				return
 			}
 			messageJSON, err := json.Marshal(message)
 			if err != nil {
-				fmt.Println("Error marshaling message:", err)
+				log.Println("Error marshaling message:", err)
 				continue
 			}
 			fmt.Fprintf(c.Writer, "data: %s\n\n", messageJSON)
@@ -134,7 +145,7 @@ func processMessages() {
 		if clientChan, exists := clients[msg.ApiKey]; exists {
 			clientChan <- msg
 		} else {
-			fmt.Println("No clients for API key:", msg.ApiKey)
+			log.Println("No clients for API key:", msg.ApiKey)
 		}
 		mu.Unlock()
 	}
@@ -159,6 +170,6 @@ func closeClient(apikey string) {
 		timer.Stop()
 		delete(heartbeats, apikey)
 	}
-	fmt.Println("disconnect ", apikey)
+	log.Println("disconnect client: ", apikey)
 	mu.Unlock()
 }

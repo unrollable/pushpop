@@ -23,3 +23,5 @@ app/web/index.html
 
 app/*.log
 app/*.tmp
+
+server/*.log
