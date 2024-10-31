@@ -65,12 +65,12 @@ class MessagesPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                SelectableText(
                   title,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Divider(),
-                Text(
+                SelectableText(
                   content,
                   style: TextStyle(fontSize: 12),
                 ),

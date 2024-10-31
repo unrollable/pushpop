@@ -47,7 +47,7 @@ class MessageNotifier extends StateNotifier<List<Message>> {
     });
 
     heartbeatTimer?.cancel();
-    heartbeatTimer = Timer.periodic(Duration(seconds: 20), (timer) {
+    heartbeatTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       _sendHeartbeat(settings);
     });
   }
