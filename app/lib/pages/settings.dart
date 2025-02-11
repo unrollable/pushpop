@@ -94,8 +94,8 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildSettingsSection(
               title: '账户',
               children: [
-                _buildButtonSetting(context, '未登录', '登录', signIn),
-                SizedBox(height: 10),
+                // _buildButtonSetting(context, '未登录', '登录', signIn),
+                // SizedBox(height: 10),
                 _buildApiKeySetting(context),
               ],
             ),
