@@ -87,8 +87,9 @@ flutter build windows
 
 ## Note
 - If you want use your own server, follow these steps:
-  -  open the`customServer` at settings page
-  -  fill out your configurations
+  -  `cd server` and run `go build -o server` to build the server, then run it
+  -  enable `customServer` at settings page
+  -  fill out your own server configurations
   -  click the button `reconnect` to connect your server
 - The project is still under development and primarily for personal use. Any bug is possible, so please submit an [issue](https://github.com/unrollable/pushpop/issues).
 - Do not use commercially
